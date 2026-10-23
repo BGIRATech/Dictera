@@ -1,0 +1,11 @@
+# Phase 1 — socle (touche push-to-talk, capture micro, sons)
+numpy>=2.1
+sounddevice>=0.5
+
+# Phase 2 — transcription locale (faster-whisper / CTranslate2 sur CUDA, float16)
+faster-whisper>=1.2
+nvidia-cublas-cu12  # cuBLAS 12, chargé depuis le .venv (aucun toolkit CUDA système requis)
+nvidia-cudnn-cu12==9.*  # cuDNN 9 : sous-bibliothèques chargées pendant les vraies dictées (requis)
+
+# Phase 5 — interface (4 pages) et zone de notification, en Qt
+PySide6-Essentials>=6.8

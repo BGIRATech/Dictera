@@ -1,0 +1,27 @@
+# --- Données et réglages personnels ---------------------------------------------
+# Les vrais réglages vivent dans %APPDATA%\Dictera ; publier config.example.json.
+config.json
+*.db
+*.db-wal
+*.db-shm
+*.log
+logs/
+
+# --- Modèles, environnement, build ----------------------------------------------
+models/
+*.bin
+.venv/
+venv/
+build/
+dist/
+__pycache__/
+*.py[cod]
+*.spec.bak
+
+# --- Divers ---------------------------------------------------------------------
+*.wav
+*.png
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

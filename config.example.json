@@ -1,0 +1,30 @@
+{
+  "hotkey": "RCTRL",
+  "sounds_enabled": true,
+  "input_device": null,
+  "min_hold_ms": 200,
+  "max_record_s": 600,
+  "whisper_model": "large-v3-turbo",
+  "language": "fr",
+  "restore_clipboard": true,
+  "paste_delay_ms": 80,
+  "restore_delay_ms": 500,
+  "paste_keys": "ctrl+v",
+  "shift_insert_apps": [
+    "mintty.exe",
+    "putty.exe",
+    "kitty.exe"
+  ],
+  "clipboard_no_history": true,
+  "reformulation": "auto",
+  "ollama_url": "http://127.0.0.1:11434",
+  "ollama_model": "llama3.1:8b",
+  "ollama_timeout_s": 8.0,
+  "llm_enabled": true,
+  "llm_url": "http://localhost:1234/v1/chat/completions",
+  "llm_model": "mistralai/mistral-nemo-instruct-2407",
+  "llm_timeout_s": 3.0,
+  "llm_temperature": 0.2,
+  "typing_wpm": 40,
+  "first_name": ""
+}
