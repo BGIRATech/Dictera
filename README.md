@@ -127,3 +127,12 @@ docs/               spécification produit, installation
 - **Adresses dictées** : Whisper normalise parfois une adresse dictée et peut en perdre une partie (« arobase », voire le domaine). Le LLM rattrape souvent l'adresse, mais relisez les adresses importantes.
 - **Fenêtres administrateur** : coller dans une fenêtre lancée en administrateur exige de lancer Dictera en administrateur. Sinon, le texte reste dans le presse-papiers.
 - **Langue** : la mise au propre (règles et consigne du LLM) est prévue pour le français.
+
+## Licence
+
+[MIT](LICENSE).
+
+Les modèles et bibliothèques utilisés gardent leur propre licence :
+- les modèles Whisper sont publiés par OpenAI sous licence MIT ;
+- PySide6 est sous LGPL ;
+- les DLL NVIDIA CUDA sont soumises à la licence NVIDIA. Elles sont incluses dans l'exécutable construit, pas dans ce dépôt.
