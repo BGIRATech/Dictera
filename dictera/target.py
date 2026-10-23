@@ -21,12 +21,14 @@ class Target:
     pid: int
     thread_id: int
     exe: str  # ex. "notepad.exe" ; sert aussi à étiqueter l'historique (Phase 4)
-    title: str  # utilisé pour les journaux de collage, jamais stocké dans l'historique
+    title: str  # en mémoire seulement (site reconnu dans le navigateur) : ni journalisé ni stocké
     elevated: bool | None  # None : jeton illisible (typiquement une fenêtre administrateur)
     exe_path: str = ""  # chemin complet : nom lisible de l'appli (app_names.display_name)
 
     def __str__(self) -> str:
-        return f"{self.exe} « {self.title[:60]} » (hwnd=0x{self.hwnd:X})"
+        # Sans le titre : il peut contenir un sujet de mail ou un nom de document, et ceci
+        # finit dans les journaux sur disque.
+        return f"{self.exe} (hwnd=0x{self.hwnd:X})"
 
 
 def _text(fn, hwnd: int) -> str:

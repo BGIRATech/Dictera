@@ -21,7 +21,7 @@ from . import win32
 
 log = logging.getLogger(__name__)
 
-PRESS, RELEASE, CANCEL = "press", "release", "cancel"
+PRESS, RELEASE, CANCEL, REJECTED = "press", "release", "cancel", "rejected"
 
 
 class PushToTalkHook:
@@ -96,7 +96,12 @@ class PushToTalkHook:
             down = w_param in (win32.WM_KEYDOWN, win32.WM_SYSKEYDOWN)
             up = w_param in (win32.WM_KEYUP, win32.WM_SYSKEYUP)
             if kb.vkCode == self.vk:
-                if down and not self._held:  # l'auto-répétition renvoie des KEYDOWN : ignorés
+                if down and not self._held and kb.flags & win32.LLKHF_LOWER_IL_INJECTED:
+                    # Les frappes injectées restent acceptées (touche de souris émulée par son logiciel,
+                    # en intégrité normale), mais pas depuis un processus en bac à sable : une page
+                    # web compromise ne doit pas pouvoir déclencher le micro.
+                    self._events.put((REJECTED, time.perf_counter(), True))
+                elif down and not self._held:  # l'auto-répétition renvoie des KEYDOWN : ignorés
                     self._held = True
                     self._cancelled = False
                     self._events.put((PRESS, time.perf_counter(), bool(kb.flags & win32.LLKHF_INJECTED)))
@@ -117,6 +122,9 @@ class PushToTalkHook:
                     self._on_press(injected)
                 elif kind == RELEASE:
                     self._on_release()
+                elif kind == REJECTED:
+                    log.warning("Appui sur la touche de dictée ignoré : injecté par un processus "
+                                "d'intégrité inférieure")
                 else:
                     self._on_cancel()
             except Exception:

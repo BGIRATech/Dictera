@@ -20,6 +20,7 @@ WM_SYSKEYDOWN = 0x0104
 WM_SYSKEYUP = 0x0105
 
 LLKHF_EXTENDED = 0x01
+LLKHF_LOWER_IL_INJECTED = 0x02  # injecté par un processus d'intégrité inférieure (bac à sable)
 LLKHF_INJECTED = 0x10
 
 INPUT_KEYBOARD = 1
