@@ -36,7 +36,7 @@
   - **Historique** : recherche et filtres, effacement réel du texte dans le fichier ;
   - **Dictionnaire** ;
   - **Réglages** : modèle, langue, micro, touche, LLM avec sa liste de modèles chargée dynamiquement.
-- **Wisp, en option** : si le compagnon de bureau [Wisp](../Wisp) est lancé, il montre la dictée.
+- **Wisp, en option** : si le compagnon de bureau [Wisp](https://github.com/BGIRATech/Wisp) est lancé, il montre la dictée.
   - Pendant l'appui, sa flamme pulse au rythme de la voix, puis il réfléchit pendant la transcription.
   - Il fait un clin d'œil avec le nombre de mots collés, ou affiche une erreur.
   - Seul l'état passe par le pipe local `\\.\pipe\wisp-bus`, jamais le texte. Sans Wisp, rien ne change.

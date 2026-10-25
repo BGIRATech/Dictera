@@ -89,7 +89,8 @@ premium pour Windows 11. Sobre, précis, raffiné ; hiérarchie nette, espace ma
   Windows (Microphone) ». Note : coller dans une fenêtre lancée en administrateur
   exige de lancer Dictera en administrateur.
 - Dictée : la touche (défaut Ctrl droit), la langue (fr), sons de début/fin,
-  restaurer ou non le presse-papiers.
+  restaurer ou non le presse-papiers, montrer ou non la dictée dans Wisp (activé par
+  défaut ; sans effet si Wisp n'est pas lancé).
 - Mise au propre : interrupteur de reformulation + modèle utilisé.
 - Stats : ma vitesse au clavier (mots/min) pour le calcul du temps gagné.
 
@@ -100,6 +101,9 @@ premium pour Windows 11. Sobre, précis, raffiné ; hiérarchie nette, espace ma
   local, effaçable depuis l'Historique.
 - La fenêtre active est lue uniquement pour coller et étiqueter l'historique ; jamais
   envoyée. Aucune télémétrie, aucune clé.
+- Wisp (compagnon de bureau, optionnel) ne reçoit que l'état de la dictée, par un canal
+  nommé local réservé au compte Windows : écoute et niveau du micro, transcription,
+  nombre de mots collés, erreur. Ni le texte dicté, ni le nom de l'appli cible.
 
 ## 9. Règles & valeurs par défaut
 
