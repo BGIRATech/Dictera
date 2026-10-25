@@ -1,0 +1,11 @@
+# Fins de ligne : le dépôt stocke tout en LF ; Git convertit à l'extraction selon la
+# plateforme. Un éditeur qui réécrit un fichier en CRLF ne le fait plus apparaître modifié.
+* text=auto
+
+# Scripts Windows : toujours en CRLF dans le dossier (cmd.exe et PowerShell 5 l'attendent).
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Scripts Unix : toujours en LF, même extraits sous Windows.
+*.sh text eol=lf
