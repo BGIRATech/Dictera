@@ -138,6 +138,11 @@ class SettingsPage(Page):
         self.restore.toggled.connect(lambda v: self._set("restore_clipboard", v))
         dictation.body.addLayout(_row("Restaurer le presse-papiers",
                                       "Remet son contenu d'origine après chaque collage.", self.restore))
+        self.wisp = Toggle(cfg.wisp_enabled)
+        self.wisp.toggled.connect(lambda v: self._set("wisp_enabled", v))
+        dictation.body.addLayout(_row("Montrer la dictée dans Wisp",
+                                      "Le compagnon Wisp écoute avec vous. Seul l'état est envoyé, jamais le texte.",
+                                      self.wisp))
         self.root.addWidget(dictation)
 
         # Mise au propre
@@ -207,6 +212,7 @@ class SettingsPage(Page):
     def refresh(self) -> None:
         cfg = self.ctx.config
         for toggle, value in ((self.sounds, cfg.sounds_enabled), (self.restore, cfg.restore_clipboard),
+                              (self.wisp, cfg.wisp_enabled),
                               (self.reform_on, cfg.reformulation != OFF), (self.llm_on, _llm_on(cfg))):
             toggle.blockSignals(True)  # ex. « Sons » basculé depuis la zone de notification
             toggle.setChecked(value)

@@ -26,5 +26,6 @@
   "llm_timeout_s": 3.0,
   "llm_temperature": 0.2,
   "typing_wpm": 40,
-  "first_name": ""
+  "first_name": "",
+  "wisp_enabled": true
 }

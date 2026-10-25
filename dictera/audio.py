@@ -21,6 +21,8 @@ log = logging.getLogger(__name__)
 
 SAMPLE_RATE = 16_000
 BLOCK_SIZE = 320  # 20 ms
+# Niveau affiché (Wisp) : -50 dBFS -> 0, -10 dBFS -> 1 ; retombée d'environ 15 % par bloc.
+LEVEL_FLOOR_DB, LEVEL_CEIL_DB, LEVEL_RELEASE = -50.0, -10.0, 0.85
 
 
 @dataclass(frozen=True)
@@ -85,10 +87,16 @@ class Recorder:
         self._xruns = 0
         self._truncated = False
         self._startup_ms = 0.0
+        self._level = 0.0
 
     @property
     def recording(self) -> bool:
         return self._recording
+
+    @property
+    def level(self) -> float:
+        """Niveau de la voix pendant la capture, de 0 à 1 (pour l'affichage seulement)."""
+        return self._level if self._recording else 0.0
 
     def open(self) -> None:
         """Ouvre le flux sans le démarrer (à appeler au lancement)."""
@@ -107,6 +115,7 @@ class Recorder:
             if self._recording:
                 return
             self._chunks, self._frames, self._xruns, self._truncated = [], 0, 0, False
+            self._level = 0.0
             t0 = time.perf_counter()
             stream = self._ensure_open()
             try:
@@ -172,3 +181,8 @@ class Recorder:
             return
         self._chunks.append(indata.copy())
         self._frames += frames
+        # 320 échantillons : quelques microsecondes, sans effet sur la capture.
+        rms = float(np.sqrt(np.mean(np.square(indata, dtype=np.float32))))
+        db = 20 * math.log10(rms) if rms > 1e-9 else -120.0
+        level = min(1.0, max(0.0, (db - LEVEL_FLOOR_DB) / (LEVEL_CEIL_DB - LEVEL_FLOOR_DB)))
+        self._level = max(level, self._level * LEVEL_RELEASE)

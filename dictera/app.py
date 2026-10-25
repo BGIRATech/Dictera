@@ -37,6 +37,7 @@ from .ui.context import EngineInfo, UiContext, microphone_access
 from .ui.window import MainWindow
 from .vocabulary import Vocabulary
 from .win32 import SingleInstance
+from .wisp import WispLink
 
 log = logging.getLogger(__name__)
 
@@ -94,6 +95,8 @@ class DicteraApp:
             config.paste_delay_ms, config.restore_delay_ms, config.paste_keys,
             config.shift_insert_apps, config.restore_clipboard, config.clipboard_no_history,
         )
+        # Wisp : l'état de la dictée (écoute, transcription, résultat), jamais le texte.
+        self.wisp = WispLink(config.wisp_enabled)
         self._target: Target | None = None
         self._reform_status = "Vérification du LLM local…"
 
@@ -126,6 +129,7 @@ class DicteraApp:
         except Exception as e:
             log.warning("Sortie audio indisponible : %s", e)
         self.engine.start()  # sonde GPU + chargement du modèle en arrière-plan
+        self.wisp.start()
         self.hook.start()
         self._refresh_reform_status()
         self.tray.show()
@@ -153,6 +157,8 @@ class DicteraApp:
         self._status_timer.stop()
         self.hook.stop()
         self.engine.stop()
+        self.wisp.idle()  # Wisp efface la pastille tout de suite
+        self.wisp.stop()
         self.recorder.cancel()
         self.recorder.close()
         self.sounds.close()
@@ -173,9 +179,11 @@ class DicteraApp:
             log.error("Impossible d'ouvrir le micro : %s", e)
             self.tray.notify("Micro indisponible. Vérifiez le périphérique d'entrée et les "
                              "réglages de confidentialité Windows (Microphone).")
+            self.wisp.error("Micro indisponible")
             return
         self.sounds.start()
         self.tray.set_recording(True)
+        self.wisp.listening(lambda: self.recorder.level)
 
     def _on_release(self) -> None:
         released_at = time.perf_counter()
@@ -191,18 +199,22 @@ class DicteraApp:
         self.recorder.cancel()
         self._target = None
         self.tray.set_recording(False)
+        self.wisp.idle()
         log.info("Dictée annulée : autre touche pressée pendant le maintien (raccourci)")
 
     def _handle_recording(self, rec: Recording, released_at: float, target: Target | None) -> None:
         if rec.duration_s * 1000 < self.config.min_hold_ms:
             log.info("Appui trop court (%.0f ms) : ignoré", rec.duration_s * 1000)
+            self.wisp.idle()
             return
+        self.wisp.thinking(engine_ready=self.engine.ready)  # remplacé par une erreur si le moteur est hors service
         self.engine.submit(rec, released_at, context=target)
 
     def _on_transcript(self, t: Transcript) -> None:
         """Appelé par le thread du moteur : les dictées sont donc insérées une par une, dans l'ordre."""
         if t.empty:
             log.info("Aucune parole détectée (%.2f s d'audio) : rien à transcrire", t.audio_s)
+            self.wisp.idle()
             return
         log.info("Transcription (%s) : %d mots, %.2f s de parole, latence %.0f ms, corrections %s, "
                  "reformulation %s en %.0f ms", t.model, len(t.final_text.split()), t.speech_s,
@@ -213,10 +225,14 @@ class DicteraApp:
         except Exception as e:
             log.exception("Échec de l'insertion")
             self.tray.notify(f"Insertion impossible : {e}")
+            self.wisp.error("Insertion impossible")
             status = "error"
         else:
             if result.status == CLIPBOARD_ONLY:
                 self.tray.notify(f"Texte copié dans le presse-papiers ({result.reason}). Collez-le avec Ctrl+V.")
+                self.wisp.copied()
+            else:
+                self.wisp.done(len(t.final_text.split()))
         # Même non collée, la dictée est gardée : l'historique permet de la recopier.
         try:
             record_transcript(self.db, t, t.context, status)
@@ -227,6 +243,7 @@ class DicteraApp:
 
     def _on_engine_error(self, message: str) -> None:
         self.tray.notify(message.splitlines()[0])
+        self.wisp.error("Moteur indisponible")
 
     # -- interface (thread principal) ---------------------------------------------------
 
@@ -285,6 +302,8 @@ class DicteraApp:
             self.sounds.enabled = c.sounds_enabled
         elif key == "restore_clipboard":
             self.inserter.restore_clipboard = c.restore_clipboard
+        elif key == "wisp_enabled":
+            self.wisp.set_enabled(c.wisp_enabled)
         elif key == "reformulation" or key.startswith("llm_"):
             self.engine.reformulator = self._make_reformulator()
             self._refresh_reform_status()

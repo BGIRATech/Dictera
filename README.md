@@ -36,6 +36,10 @@
   - **Historique** : recherche et filtres, effacement réel du texte dans le fichier ;
   - **Dictionnaire** ;
   - **Réglages** : modèle, langue, micro, touche, LLM avec sa liste de modèles chargée dynamiquement.
+- **Wisp, en option** : si le compagnon de bureau [Wisp](../Wisp) est lancé, il montre la dictée.
+  - Pendant l'appui, sa flamme pulse au rythme de la voix, puis il réfléchit pendant la transcription.
+  - Il fait un clin d'œil avec le nombre de mots collés, ou affiche une erreur.
+  - Seul l'état passe par le pipe local `\\.\pipe\wisp-bus`, jamais le texte. Sans Wisp, rien ne change.
 
 ## Prérequis
 
@@ -82,6 +86,7 @@ Tout se règle depuis la page **Réglages**. Ils sont enregistrés dans `%APPDAT
 | `llm_model` | identifiant du modèle dans LM Studio, par exemple `mistralai/mistral-nemo-instruct-2407` |
 | `llm_timeout_s`, `llm_temperature` | délai au-delà duquel les règles prennent le relais, et température |
 | `paste_delay_ms`, `restore_delay_ms` | délais du collage et de la restauration du presse-papiers |
+| `wisp_enabled` | montrer la dictée dans Wisp (`true` par défaut, sans effet si Wisp n'est pas lancé) |
 
 ## Données et vie privée
 
@@ -95,6 +100,7 @@ Tout se règle depuis la page **Réglages**. Ils sont enregistrés dans `%APPDAT
 - **Les journaux** ne contiennent jamais le texte dicté.
 - **Le titre de la fenêtre active** sert seulement à coller au bon endroit et à reconnaître quelques sites connus dans le navigateur. Il n'est jamais enregistré.
 - **Le LLM** n'est contacté que sur la machine locale (`localhost` ou `127.0.0.1`).
+- **Wisp** ne reçoit que l'état de la dictée : écoute et niveau du micro, transcription, nombre de mots, erreur. Ni le texte, ni le nom de l'appli. L'échange passe par un canal nommé local, réservé à votre compte Windows.
 - **« Tout effacer »** supprime réellement les textes du fichier (`secure_delete`, puis `VACUUM`).
 
 ## Tests
@@ -111,6 +117,7 @@ Les scripts de `scripts\` utilisent des bases et des réglages temporaires, jama
 | `test_symbols.py` | symboles dictés et adresses |
 | `test_llm.py` | reformulation par LLM local, repli sur les règles, bloc `<think>` |
 | `test_e2e.py` | bout en bout dans la vraie application, avec une voix de synthèse |
+| `test_wisp.py` | lien vers Wisp : ordre des messages, reconnexion, jamais bloquant (`--live` : démo vers le vrai Wisp) |
 
 ## Structure
 

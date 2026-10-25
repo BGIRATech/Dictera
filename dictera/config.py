@@ -63,6 +63,8 @@ class Config:
     typing_wpm: int = 40  # vitesse de frappe au clavier, pour le « temps gagné »
     # Interface (Phase 5)
     first_name: str = ""  # « Salut <prénom> » ; vide = nom d'affichage du compte Windows
+    # Wisp (compagnon de bureau) : état de la dictée envoyé par \\.\pipe\wisp-bus, jamais le texte
+    wisp_enabled: bool = True
 
     @property
     def hotkey_vk(self) -> int:
